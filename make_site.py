@@ -1,0 +1,104 @@
+# -*- coding: utf-8 -*-
+r"""组装站点：入口页 index.html + 三个自测程序（en-basic.html / en-ielts.html / ja.html）到 dist\。
+源文件：tools_basic3000\_app.html、tools_basic3000\_app_ielts.html、tools_japanese\_app_ja.html"""
+import os
+import shutil
+import sys
+
+sys.stdout.reconfigure(encoding='utf-8')
+
+BASE = os.path.dirname(os.path.abspath(__file__))
+DIST = os.path.join(BASE, 'dist')
+
+HUB = r'''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10b981">
+<title>词汇自测中心</title>
+<meta name="description" content="英语基础词汇、英语雅思词汇、日语词汇三套极速刷词自测程序">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:#f2f4f7;color:#22303f;
+  min-height:100vh;padding:26px 16px 30px;display:flex;justify-content:center;
+}
+#wrap{width:100%;max-width:560px}
+h1{font-size:23px;margin:0 0 6px;color:#17293e;letter-spacing:.5px}
+.sub{font-size:13.5px;color:#7d8fa4;margin:0 0 18px}
+.card{
+  display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;
+  padding:17px 18px;margin-bottom:12px;text-decoration:none;color:inherit;
+  box-shadow:0 1px 3px rgba(16,24,40,.07);border-left:5px solid #10b981;
+  transition:transform .12s,box-shadow .12s;
+}
+.card:active{transform:scale(.985)}
+.card.blue{border-left-color:#2563eb}
+.card.red{border-left-color:#e11d48}
+.card .txt{flex:1 1 auto}
+.card .name{font-size:17.5px;font-weight:700;color:#17293e;line-height:1.3}
+.card .meta{font-size:12.5px;color:#8a97a8;margin-top:4px}
+.card .go{
+  flex:0 0 auto;font-size:13px;font-weight:700;color:#10b981;background:#ecfdf5;
+  border-radius:999px;padding:8px 14px;
+}
+.card.blue .go{color:#2563eb;background:#eff4ff}
+.card.red .go{color:#e11d48;background:#fff1f4}
+.tip{font-size:12px;color:#93a1b2;line-height:1.7;margin:16px 4px 0}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>词汇自测中心</h1>
+  <p class="sub">选择一套词表，点「开始」即可刷词；点 ✗ / ✓ 标记，结果可导出发回。</p>
+
+  <a class="card" href="en-basic.html">
+    <div class="txt">
+      <div class="name">英语基础词汇</div>
+      <div class="meta">3887 词 · 初中高中基础 · 带音标</div>
+    </div>
+    <span class="go">开始</span>
+  </a>
+
+  <a class="card blue" href="en-ielts.html">
+    <div class="txt">
+      <div class="name">英语雅思词汇</div>
+      <div class="meta">2946 词 · 进阶 · 不含基础词汇</div>
+    </div>
+    <span class="go">开始</span>
+  </a>
+
+  <a class="card red" href="ja.html">
+    <div class="txt">
+      <div class="name">日语词汇</div>
+      <div class="meta">3961 词 · N5N4 + N3 · 带假名读音和声调</div>
+    </div>
+    <span class="go">开始</span>
+  </a>
+
+  <p class="tip">做题记录保存在你自己手机上，换人换设备互不影响。若要像 App 一样使用：在手机浏览器里打开后，用菜单中的「添加到主屏幕」。从微信里打开时，若提示「在浏览器打开」可照做。</p>
+</div>
+</body>
+</html>
+'''
+
+def main():
+    os.makedirs(DIST, exist_ok=True)
+    files = {
+        'en-basic.html': os.path.join(BASE, 'tools_basic3000', '_app.html'),
+        'en-ielts.html': os.path.join(BASE, 'tools_basic3000', '_app_ielts.html'),
+        'ja.html': os.path.join(BASE, 'tools_japanese', '_app_ja.html'),
+    }
+    for dst_name, src in files.items():
+        assert os.path.exists(src), src
+        shutil.copyfile(src, os.path.join(DIST, dst_name))
+        print(dst_name, '<-', src, os.path.getsize(src))
+    with open(os.path.join(DIST, 'index.html'), 'w', encoding='utf-8') as f:
+        f.write(HUB)
+    print('index.html (hub) bytes:', len(HUB.encode('utf-8')))
+    print('dist:', sorted(os.listdir(DIST)))
+
+main()

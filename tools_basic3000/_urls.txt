@@ -1,0 +1,7 @@
+1-初中-顺序.json | https://raw.githubusercontent.com/KyleBing/english-vocabulary/master/json/1-初中-顺序.json
+2-高中-顺序.json | https://raw.githubusercontent.com/KyleBing/english-vocabulary/master/json/2-高中-顺序.json
+3-CET4-顺序.json | https://raw.githubusercontent.com/KyleBing/english-vocabulary/master/json/3-CET4-顺序.json
+4-CET6-顺序.json | https://raw.githubusercontent.com/KyleBing/english-vocabulary/master/json/4-CET6-顺序.json
+5-考研-顺序.json | https://raw.githubusercontent.com/KyleBing/english-vocabulary/master/json/5-考研-顺序.json
+6-托福-顺序.json | https://raw.githubusercontent.com/KyleBing/english-vocabulary/master/json/6-托福-顺序.json
+7-SAT-顺序.json | https://raw.githubusercontent.com/KyleBing/english-vocabulary/master/json/7-SAT-顺序.json
