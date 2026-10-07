@@ -1,0 +1,70 @@
+# 站点存活检查：每早 8:00（北京时间）检查词表站链接是否打得开。
+# 打不开时：运行标红 + 自动开 issue（恢复后自动关闭）；每次结果追加到 status/site-check.tsv。
+name: 站点存活检查
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 00:00 UTC = 早上 8:00 北京时间
+  workflow_dispatch:       # 也可以在 Actions 页面手动点运行
+
+permissions:
+  contents: write          # 提交检查记录
+  issues: write            # 失败时开 issue
+
+concurrency:
+  group: site-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 检查站点链接
+        id: check
+        run: bash scripts/site-check.sh
+
+      - name: 提交检查记录
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add status/site-check.tsv || true
+          if ! git diff --cached --quiet; then
+            git commit -m "站点检查记录 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            git pull --rebase origin main || true
+            git push
+          fi
+
+      - name: 打不开时开 issue（已存在则补充留言）
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          body=$(cat <<EOF
+          检查时间（北京）：$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')
+
+          打不开的链接：
+          $(tail -n 1 status/site-check.tsv | cut -f3)
+
+          查看运行记录：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EOF
+          )
+          num=$(gh issue list --state open --search '站点打不开 in:title' --json number --jq '.[0].number // empty')
+          if [ -z "$num" ]; then
+            gh issue create --title "站点打不开（自动检查）" --body "$body"
+          else
+            gh issue comment "$num" --body "$body"
+          fi
+
+      - name: 恢复正常后关闭 issue
+        if: steps.check.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          num=$(gh issue list --state open --search '站点打不开 in:title' --json number --jq '.[0].number // empty')
+          if [ -n "$num" ]; then
+            gh issue close "$num" --comment "站点已恢复（$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')）"
+          fi

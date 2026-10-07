@@ -47,6 +47,9 @@
 | `dist/` | 早期无发音版本（保留备用） |
 | `docs/` | 打印版 PDF：英语基础词表-自测勾叉版（36 页，双面 18 张）、英语雅思词表-自测勾叉版（32 页，双面 16 张） |
 | `make_site.py` | 组装无发音版 dist 的旧脚本 |
+| `.github/workflows/` | 站点自动检查的定时配置（site-check.yml） |
+| `scripts/` | 辅助脚本：site-check.sh（站点检查清单与重试逻辑） |
+| `status/` | 自动检查记录：site-check.tsv（每跑一次追加一行） |
 
 ## 本地预览
 
@@ -79,6 +82,15 @@ python -m http.server 8014
 4. `audio_dev/transcode32.py` —— 转码 32 kbps
 5. `audio_dev/make_audio_sites.py` —— 组装两个站点并校验平台限制（脚本顶部 `JA_URL` 为日语站正式地址）
 
+## 站点自动检查
+
+GitHub Actions 每早 8:00（北京时间）自动检查两个站点的页面与发音文件是否打得开：
+
+- 配置：`.github/workflows/site-check.yml`；检查清单在 `scripts/site-check.sh`（失败自动重试 3 次）
+- 结果记录：`status/site-check.tsv`，每跑一次追加一行
+- 打不开时：自动在仓库开一个 issue（GitHub 会通知），恢复后自动关闭
+- 想手动跑一次：仓库 Actions 页面 → 站点存活检查 → Run workflow
+
 ## 数据来源
 
 词表由公开开源数据整理而成，仅供个人学习使用：
@@ -89,5 +101,6 @@ python -m http.server 8014
 
 ## 更新记录
 
+- 2026-10-07：加入站点自动检查：GitHub Actions 每早 8:00 巡检两个站点页面与发音文件，打不开自动开 issue、恢复自动关闭。
 - 2026-10-07：README 顶部新增公众号「问答小王子」二维码（微信扫码在线体验），原图两个尺寸存于 `assets/`。
 - 2026-10-05：加入"标记（✓/✗/快捷键）自动播放发音"；整理本仓库并推送到 GitHub；两个发音版站点上线。
